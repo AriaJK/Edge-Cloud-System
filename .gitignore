@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.pyc
+
+# 环境
+.env
+venv/
+.venv/
+
+# 临时图片
+edge/dashboard/latest.jpg
+dashboard/latest.jpg
+*.tmp.jpg
+temp.jpg
+
+# 模型文件（可选上传，如果太大可以忽略）
+yolov8n.pt
+
+# 日志
+*.log
+status.json
+
+# IDE
+.vscode/
+.idea/
+
+# 系统文件
+.DS_Store
+Thumbs.db

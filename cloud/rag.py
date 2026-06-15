@@ -24,7 +24,9 @@ from chromadb.utils import embedding_functions
 
 from openai import OpenAI
 from dotenv import load_dotenv
+from pathlib import Path
 
+ROOT_DIR = Path(__file__).resolve().parent.parent
 load_dotenv()
 
 # ============================
@@ -724,3 +726,8 @@ if __name__ == "__main__":
   python rag.py search "安全巡检规范"
   python rag.py query "发现可疑人员应该怎么办?"
 """)
+
+kb = _get_kb()
+print(kb.stats())
+
+print(kb.search("安全巡检", top_k=3))

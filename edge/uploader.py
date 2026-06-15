@@ -1,16 +1,32 @@
 import requests
+from pathlib import Path
 
-def upload_image(image_path):
+ROOT_DIR = Path(__file__).resolve().parent.parent
+CLOUD_URL = "http://127.0.0.1:8000/analyze"
 
-    url = "http://127.0.0.1:8000/analyze"
 
-    with open('C:/Users/23838/Pictures/Camera Roll/家人/567.jpg', "rb") as f:
+def upload_image(image_path, person_count):
+    """
+    上传YOLO图像到云端
+    """
 
-        files = {
-            "file": f
-        }
+    try:
+        with open(image_path, "rb") as f:
+            files = {"file": f}
+            data = {"person_count": person_count}
 
-        response = requests.post(url, files=files)
+            response = requests.post(
+                CLOUD_URL,
+                files=files,
+                data=data,
+                timeout=30
+            )
 
-    print("状态码:", response.status_code)
-    print("返回内容:", response.text)
+        print("[UPLOAD] 状态码:", response.status_code)
+        print("[UPLOAD] 返回:", response.text)
+
+        return response.json()
+
+    except Exception as e:
+        print("[UPLOAD ERROR]", e)
+        return None

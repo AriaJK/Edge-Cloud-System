@@ -1,6 +1,8 @@
 import json
 from datetime import datetime
+from pathlib import Path
 
+ROOT_DIR = Path(__file__).resolve().parent.parent
 
 def update_status(
         person_count,

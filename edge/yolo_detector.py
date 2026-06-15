@@ -1,6 +1,8 @@
 from ultralytics import YOLO
 import cv2
+from pathlib import Path
 
+ROOT_DIR = Path(__file__).resolve().parent.parent
 model = YOLO("yolov8n.pt")
 
 cap = cv2.VideoCapture(0)

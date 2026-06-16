@@ -4,7 +4,6 @@ import requests
 import pandas as pd
 import os
 
-from streamlit_autorefresh import st_autorefresh
 
 # ==========================
 # 页面配置
@@ -17,13 +16,11 @@ st.set_page_config(
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 ROOT_DIR = os.path.abspath(os.path.join(BASE_DIR, ".."))
 
+# 云端 API 地址（Docker 内部用 http://api:8000，本地用 http://127.0.0.1:8000）
+API_URL = os.getenv("API_URL", "http://127.0.0.1:8000")
+
 # ✅ 统一图片路径（关键修复）
 LATEST_IMAGE = os.path.join(ROOT_DIR, "dashboard", "latest.jpg")
-
-# ==========================
-# 自动刷新
-# ==========================
-st_autorefresh(interval=3000, key="refresh")
 
 # ==========================
 # 读取状态
@@ -114,72 +111,34 @@ with col1:
     question = st.chat_input("请输入问题")
 
     if question:
-
-        # 保存用户消息
-        st.session_state.messages.append(
-            {
-                "role": "user",
-                "content": question
-            }
-        )
-
-        # 显示用户输入
+        # 显示用户消息
         with st.chat_message("user"):
             st.write(question)
 
-        try:
+        # 调用 Agent 并显示回答
+        with st.chat_message("assistant"):
+            placeholder = st.empty()
+            placeholder.markdown("⏳ *Agent分析中...*")
+            try:
+                resp = requests.post(
+                    f"{API_URL}/chat/full",
+                    json={
+                        "question": question,
+                        "history": st.session_state.messages
+                    },
+                    timeout=60
+                )
+                if resp.status_code == 200:
+                    answer = resp.json().get("answer", "Agent没有返回内容")
+                else:
+                    answer = f"Agent错误: {resp.status_code}"
+            except Exception as e:
+                answer = f"Agent暂时不可用: {e}"
+            placeholder.markdown(answer)
 
-            with st.chat_message("assistant"):
-
-                with st.spinner("Agent分析中..."):
-
-                    response = requests.post(
-                        "http://127.0.0.1:8000/chat/full",
-                        json={
-                            "question": question,
-                            "history": st.session_state.messages[-10:]
-                        },
-                        timeout=60
-                    )
-
-                    if response.status_code == 200:
-
-                        data = response.json()
-
-                        answer = data.get(
-                            "answer",
-                            "Agent没有返回内容"
-                        )
-
-                    else:
-
-                        answer = (
-                            f"Agent错误:"
-                            f"{response.status_code}"
-                        )
-
-                    st.write(answer)
-
-            st.session_state.messages.append(
-                {
-                    "role": "assistant",
-                    "content": answer
-                }
-            )
-
-
-        except Exception as e:
-
-            answer = f"Agent暂时不可用:{e}"
-
-            st.error(answer)
-
-            st.session_state.messages.append(
-                {
-                    "role": "assistant",
-                    "content": answer
-                }
-            )
+        # 保存到历史
+        st.session_state.messages.append({"role": "user", "content": question})
+        st.session_state.messages.append({"role": "assistant", "content": answer})
 
 
 # --------------------------

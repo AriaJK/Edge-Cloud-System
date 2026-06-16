@@ -1,0 +1,33 @@
+# ==========================================
+# 边云协同智能检测系统 - Docker 依赖
+# ==========================================
+# 安装: pip install -r docker/requirements.txt
+
+# --- Web 框架 ---
+fastapi==0.115.*
+uvicorn[standard]==0.34.*
+python-dotenv==1.1.*
+
+# --- AI / LLM ---
+openai==1.93.*
+
+# --- 视觉处理 ---
+opencv-python-headless==4.11.*
+numpy==2.2.*
+
+# --- Dashboard ---
+streamlit==1.45.*
+streamlit-autorefresh==1.0.*
+pandas==2.3.*
+requests==2.32.*
+
+# --- 向量数据库 / RAG ---
+chromadb==0.6.*
+sentence-transformers==3.4.*
+
+# --- 搜索 ---
+duckduckgo-search==7.5.*
+
+# --- 工具 ---
+pydantic==2.11.*
+python-multipart==0.0.*

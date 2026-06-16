@@ -1,0 +1,51 @@
+# ==========================================
+# 边云协同智能检测系统 - Docker Compose
+# ==========================================
+# 启动: docker-compose up -d
+# 停止: docker-compose down
+# ==========================================
+
+services:
+
+  # ── API 网关 + 智能体 ──────────────────
+  api:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.api
+    container_name: edge-cloud-api
+    ports:
+      - "8000:8000"
+    volumes:
+      # 知识库文档（只读）
+      - ../knowledge_base:/app/knowledge_base:ro
+      # 向量数据库持久化
+      - chroma_data:/app/chroma_db
+      # 边缘端写入的文件（latest.jpg + status.json）
+      - ../dashboard:/app/dashboard
+      - ../status.json:/app/status.json
+    env_file:
+      - ../.env
+    restart: unless-stopped
+
+  # ── Dashboard 管理平台 ──────────────────
+  dashboard:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.dashboard
+    container_name: edge-cloud-dashboard
+    ports:
+      - "8501:8501"
+    volumes:
+      # 共享边缘端写入的数据
+      - ../dashboard:/app/dashboard
+      - ../status.json:/app/status.json
+    environment:
+      - API_URL=http://api:8000
+    depends_on:
+      - api
+    restart: unless-stopped
+
+# ── 持久化卷 ─────────────────────────────
+volumes:
+  chroma_data:
+    driver: local

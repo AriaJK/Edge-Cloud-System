@@ -1,0 +1,28 @@
+# ==========================================
+# 边云协同智能检测系统 - API 网关 + 智能体
+# ==========================================
+FROM python:3.12-slim
+
+# 系统依赖（OpenCV 需要）
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libgl1 \
+    libglib2.0-0 \
+    libgomp1 \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# 安装 Python 依赖
+COPY docker/requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# 复制云端代码和数据
+COPY cloud/ /app/cloud/
+COPY knowledge_base/ /app/knowledge_base/
+COPY .env /app/
+
+# 暴露端口
+EXPOSE 8000
+
+# 启动 API 服务
+CMD ["uvicorn", "cloud.main:app", "--host", "0.0.0.0", "--port", "8000"]

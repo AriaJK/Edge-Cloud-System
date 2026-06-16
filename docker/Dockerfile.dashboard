@@ -1,0 +1,26 @@
+# ==========================================
+# 边云协同智能检测系统 - Dashboard 管理平台
+# ==========================================
+FROM python:3.12-slim
+
+WORKDIR /app
+
+# 安装 Python 依赖（仅 Dashboard 需要的）
+COPY docker/requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# 复制 Dashboard 代码
+COPY dashboard/ /app/dashboard/
+
+# 暴露端口
+EXPOSE 8501
+
+# API 地址可通过环境变量配置（Docker 内部用 http://api:8000）
+ENV API_URL=http://api:8000
+
+# 启动 Streamlit
+CMD ["streamlit", "run", "dashboard/app.py", \
+     "--server.port=8501", \
+     "--server.address=0.0.0.0", \
+     "--server.headless=true", \
+     "--browser.gatherUsageStats=false"]

@@ -1,0 +1,34 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+
+# 虚拟环境
+.venv/
+venv/
+env/
+
+# IDE
+.vscode/
+.idea/
+
+# Git
+.git/
+.gitignore
+
+# 大文件
+yolov8n.pt
+temp.jpg
+*.mp4
+*.avi
+
+# 系统
+.DS_Store
+Thumbs.db
+
+# 不需要打包到镜像的
+edge/              # 边端代码（不含在 Docker 内）
+upload_queue/      # 离线队列（宿主机存储）
